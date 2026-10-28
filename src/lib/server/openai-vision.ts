@@ -3,6 +3,8 @@ import { DRAWING_TOPICS } from '../game/topics'
 
 type ImageDecision = { guess: string; confidence: number; reason: string }
 
+const defaultVisionModel = 'deepseek-flash'
+
 const visualClues: Record<typeof DRAWING_TOPICS[number]['word'], string> = {
   桃子: '圆润或心形果实，顶部凹口、叶子或中间弧线',
   西瓜: '圆形带条纹的瓜，或带瓜皮和籽的三角形瓜片',
@@ -53,7 +55,7 @@ async function createVisionResponse(
   schema: Record<string, unknown>,
 ) {
   if (!env.OPENAI_API_KEY) throw new Error('OPENAI_API_KEY is unavailable')
-  const baseUrl = (env.AI_API_BASE_URL || 'https://api.openai.com/v1').replace(/\/$/, '')
+  const baseUrl = (env.AI_API_BASE_URL || 'https://api.deepseek.com').replace(/\/$/, '')
   const isChatCompatible = !baseUrl.includes('api.openai.com')
   const response = await fetch(`${baseUrl}/${isChatCompatible ? 'chat/completions' : 'responses'}`, {
     method: 'POST',
@@ -63,7 +65,7 @@ async function createVisionResponse(
       'content-type': 'application/json',
     },
     body: JSON.stringify(isChatCompatible ? {
-      model: env.OPENAI_VISION_MODEL || 'glm-4.5v',
+      model: env.OPENAI_VISION_MODEL || defaultVisionModel,
       messages: [{ role: 'user', content: [
         { type: 'text', text: `${prompt}\nReturn only valid JSON matching this JSON Schema: ${JSON.stringify(schema)}` },
         ...images.map((url) => ({ type: 'image_url', image_url: { url } })),
@@ -73,7 +75,7 @@ async function createVisionResponse(
       response_format: { type: 'json_object' },
       max_tokens: 100,
     } : {
-      model: env.OPENAI_VISION_MODEL || 'gpt-5.6-luna',
+      model: env.OPENAI_VISION_MODEL || defaultVisionModel,
       store: false,
       max_output_tokens: 100,
       input: [{

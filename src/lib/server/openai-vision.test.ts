@@ -50,13 +50,27 @@ describe('OpenAI-compatible vision', () => {
     await expect(guessDrawing(env, 'data:image/jpeg;base64,YQ==')).resolves.toMatchObject({ guess: '未知', confidence: 0 })
   })
 
+  it('uses DeepSeek flash when the provider is not configured', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({
+      choices: [{ message: { content: '{"guess":"桥","confidence":0.8,"reason":"有桥面和桥墩"}' } }],
+    }), { status: 200 }))
+    vi.stubGlobal('fetch', fetchMock)
+    await expect(guessDrawing({ OPENAI_API_KEY: 'test-key' } as DrawGuessEnv, 'data:image/jpeg;base64,YQ==')).resolves.toMatchObject({ guess: '桥' })
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit]
+    const body = JSON.parse(String(init.body))
+    expect(url).toBe('https://api.deepseek.com/chat/completions')
+    expect(body.model).toBe('deepseek-flash')
+    expect(body.messages[0].content[1]).toEqual({ type: 'image_url', image_url: { url: 'data:image/jpeg;base64,YQ==' } })
+  })
+
   it('constrains the Responses API to the full topic pool without revealing drinks or blessings', async () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({
       output: [{ content: [{ text: '{"guess":"桥","confidence":0.8,"reason":"有桥面和桥墩"}' }] }],
     }), { status: 200 }))
     vi.stubGlobal('fetch', fetchMock)
-    await expect(guessDrawing({ ...env, AI_API_BASE_URL: 'https://api.openai.com/v1' }, 'data:image/jpeg;base64,YQ==')).resolves.toMatchObject({ guess: '桥' })
+    await expect(guessDrawing({ ...env, AI_API_BASE_URL: 'https://api.openai.com/v1', OPENAI_VISION_MODEL: 'gpt-4.1-mini' }, 'data:image/jpeg;base64,YQ==')).resolves.toMatchObject({ guess: '桥' })
     const body = JSON.parse(String((fetchMock.mock.calls[0][1] as RequestInit).body))
+    expect(body.model).toBe('gpt-4.1-mini')
     expect(body.text.format.schema.properties.guess.maxLength).toBe(2)
     expect(body.text.format.schema.properties.guess.enum).toEqual([...DRAWING_TOPICS.map(topic => topic.word), '未知'])
     const prompt = body.input[0].content[0].text
