@@ -91,12 +91,15 @@ export type PublicGameRoom = {
 }
 
 const ALIASES: Record<string, string> = {
-  '桃': '桃子', peach: '桃子', watermelon: '西瓜', apple: '苹果', star: '星星', '五角星': '星星', sun: '太阳', '日头': '太阳', 'light bulb': '灯泡', lightbulb: '灯泡', bulb: '灯泡', guitar: '吉他', sailboat: '帆船', 'sailing boat': '帆船', bridge: '桥', '桥梁': '桥',
-  bike: 'bicycle',
-  cellphone: 'phone',
-  'cell phone': 'phone',
-  television: 'tv',
-  aeroplane: 'airplane',
+  '桃': '桃子', peach: '桃子',
+  watermelon: '西瓜',
+  apple: '苹果',
+  star: '星星', '五角星': '星星',
+  sun: '太阳', '日头': '太阳',
+  'light bulb': '灯泡', lightbulb: '灯泡', bulb: '灯泡',
+  guitar: '吉他',
+  sailboat: '帆船', 'sailing boat': '帆船',
+  bridge: '桥', '桥梁': '桥',
 }
 
 export function isGameRoomId(value: unknown): value is string {

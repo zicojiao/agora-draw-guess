@@ -28,28 +28,27 @@ describe('game model', () => {
     for (const code of ['12345', '1234567', '12a456', '１２３４５６', 123456]) expect(isGameRoomId(code)).toBe(false)
   })
 
-  it('normalizes punctuation, whitespace, case, and curated aliases', () => {
-    expect(normalizeGuess('  CELL-phone!! ')).toBe('phone')
-    expect(isCorrectGuess('Bike', 'bicycle')).toBe(true)
+  it('normalizes punctuation, whitespace, case, and the nine topic aliases', () => {
+    expect(normalizeGuess('  Light-bulb!! ')).toBe('灯泡')
+    expect(isCorrectGuess('桃', '桃子')).toBe(true)
+    expect(isCorrectGuess('bridge', '桥')).toBe(true)
   })
 
   it('finds close guesses without accepting them as correct', () => {
-    expect(editDistance('elefant', 'elephant')).toBe(2)
-    expect(isCloseGuess('aplpe', 'apple')).toBe(false)
-    expect(isCloseGuess('elephan', 'elephant')).toBe(true)
-    expect(isCloseGuess('apple', 'apple')).toBe(false)
+    expect(editDistance('星形', '星星')).toBe(1)
+    expect(isCloseGuess('吉他', '西瓜')).toBe(false)
+    expect(isCloseGuess('星形', '星星')).toBe(true)
+    expect(isCloseGuess('星星', '星星')).toBe(false)
   })
 
-
-
-  it('builds hints without hiding separators', () => {
-    expect(wordHint('ice-cream', new Set([0, 4]))).toBe('I _ _ - C _ _ _ _')
+  it('builds character hints for the current topic', () => {
+    expect(wordHint('桃子', new Set([0]))).toBe('桃 _')
   })
 
-  it('reveals progressive hint letters halfway through a turn', () => {
-    expect([...progressiveHintIndexes('birthday cake', 0, 60_000, 29_999)]).toEqual([])
-    expect([...progressiveHintIndexes('birthday cake', 0, 60_000, 30_000)]).toEqual([4])
-    expect([...progressiveHintIndexes('birthday cake', 0, 60_000, 45_000)]).toEqual([4, 9])
+  it('reveals one character halfway through a two-character topic', () => {
+    expect([...progressiveHintIndexes('桃子', 0, 60_000, 29_999)]).toEqual([])
+    expect([...progressiveHintIndexes('桃子', 0, 60_000, 30_000)]).toEqual([0])
+    expect([...progressiveHintIndexes('桥', 0, 60_000, 45_000)]).toEqual([])
   })
 
   it('rewards earlier guesses and prevents late winner settlement', () => {

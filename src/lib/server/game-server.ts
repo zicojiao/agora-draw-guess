@@ -7,7 +7,6 @@ import {
   createGameToken,
   createPlayerId,
   gameChannelName,
-  isCorrectGuess,
   isGameRoomId,
   isGameSeatToken,
   progressiveHintIndexes,
@@ -534,8 +533,4 @@ export async function createRoomWithHost(env: DrawGuessEnv, nickname: string) {
     return { roomId, playerId, seatToken }
   }
   throw new Error('Unable to allocate an unused room number')
-}
-
-export function isAiGuessCorrect(guess: string, answer: string) {
-  return isCorrectGuess(guess, answer)
 }
