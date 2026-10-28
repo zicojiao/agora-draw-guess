@@ -1,7 +1,7 @@
 {
   "name": "agora-draw-guess",
   "version": "0.1.0",
-  "description": "中文你画AI猜：与朋友和 AI 画友一起玩，画出灵感，收获祝福。",
+  "description": "You draw. AI guesses. A Chinese multiplayer drawing game played with friends and an AI player.",
   "private": true,
   "license": "MIT",
   "type": "module",
