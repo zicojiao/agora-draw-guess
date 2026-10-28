@@ -1,1 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630"><rect width="1200" height="630" fill="#fff9e6"/><rect x="60" y="60" width="1080" height="510" rx="40" fill="white" stroke="#18252a" stroke-width="7"/><text x="120" y="220" font-size="80" font-family="sans-serif" font-weight="900" fill="#18252a">你画AI猜 · 灵感碰杯</text><text x="120" y="330" font-size="42" font-family="sans-serif" fill="#099dfd">朋友一起画，AI 一起猜。</text><text x="120" y="430" font-size="32" font-family="sans-serif" fill="#354742">画出灵感，猜中快乐，收获美好祝福。</text><text x="120" y="515" font-size="26" font-family="sans-serif" fill="#354742">Agora · 实时语音与默契</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">你画AI猜 · 灵感碰杯</title>
+  <desc id="desc">朋友一起画，AI 一起猜。画出灵感，猜中快乐，收获美好祝福。</desc>
+  <rect width="1200" height="630" fill="#fffdf7"/>
+  <circle cx="110" cy="560" r="150" fill="#38bdf8" opacity=".22"/>
+  <circle cx="1090" cy="70" r="150" fill="#ffd84d" opacity=".7"/>
+  <rect x="64" y="64" width="1072" height="506" rx="36" fill="#ffd84d"/>
+  <rect x="48" y="48" width="1072" height="506" rx="36" fill="#ffffff" stroke="#171a1f" stroke-width="7"/>
+
+  <text x="92" y="148" fill="#68717b" font-family="PingFang SC, Hiragino Sans GB, Noto Sans SC, sans-serif" font-size="24" font-weight="700" letter-spacing="5">灵感碰杯</text>
+  <text x="92" y="248" fill="#171a1f" font-family="PingFang SC, Hiragino Sans GB, Noto Sans SC, sans-serif" font-size="84" font-weight="900">你画AI猜</text>
+  <text x="92" y="322" fill="#075985" font-family="PingFang SC, Hiragino Sans GB, Noto Sans SC, sans-serif" font-size="32" font-weight="800">朋友一起画，AI 一起猜。</text>
+  <text x="92" y="384" fill="#171a1f" font-family="PingFang SC, Hiragino Sans GB, Noto Sans SC, sans-serif" font-size="26" font-weight="650">画出灵感，猜中快乐，收获美好祝福。</text>
+  <text x="92" y="470" fill="#68717b" font-family="PingFang SC, Hiragino Sans GB, Noto Sans SC, sans-serif" font-size="20" font-weight="700">桃子 · 西瓜 · 苹果 · 星星 · 太阳</text>
+  <text x="92" y="506" fill="#68717b" font-family="PingFang SC, Hiragino Sans GB, Noto Sans SC, sans-serif" font-size="20" font-weight="700">灯泡 · 吉他 · 帆船 · 桥</text>
+
+  <g transform="translate(700 92)">
+    <rect width="360" height="420" rx="28" fill="#dff3ff" stroke="#171a1f" stroke-width="6"/>
+    <rect x="24" y="24" width="312" height="230" rx="18" fill="#fffdf7" stroke="#171a1f" stroke-width="5"/>
+    <g transform="translate(78 42) scale(5.4)" fill="none" stroke="#c94870" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M16 11C9 5 4 12 6 20c2 6 10 10 10 10s9-5 10-11c2-9-5-13-10-8Z"/>
+      <path d="M16 11c-1-5 2-8 7-7-1 4-3 6-7 7Zm0 3c3 4 2 8 0 12"/>
+    </g>
+    <rect x="24" y="274" width="200" height="56" rx="16" fill="#ffffff" stroke="#171a1f" stroke-width="5"/>
+    <path d="M48 330l14 16 8-16" fill="#ffffff" stroke="#171a1f" stroke-width="5" stroke-linejoin="round"/>
+    <text x="124" y="310" text-anchor="middle" fill="#171a1f" font-family="PingFang SC, Hiragino Sans GB, Noto Sans SC, sans-serif" font-size="24" font-weight="800">AI 猜：桃子</text>
+    <rect x="24" y="358" width="148" height="42" rx="12" fill="#ffd84d" stroke="#171a1f" stroke-width="4"/>
+    <text x="98" y="386" text-anchor="middle" fill="#171a1f" font-family="PingFang SC, Hiragino Sans GB, Noto Sans SC, sans-serif" font-size="18" font-weight="800">Agora 语音</text>
+  </g>
+</svg>
