@@ -25,6 +25,7 @@
     "start": "node .output/server/index.mjs",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
+    "verify": "pnpm test && pnpm typecheck && pnpm build",
     "deploy": "vercel --prod"
   },
   "dependencies": {
