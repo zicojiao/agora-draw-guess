@@ -9,7 +9,7 @@ const copy = {
     voice: '加入语音后，Agora RTC 将玩家的麦克风声音实时传给同一房间的伙伴。画面中的线条交给视觉模型识别，玩家之间的交流交给 RTC 连接。麦克风只在你主动加入语音后开启。',
     flowTitle: '从一笔线条，到一次猜中。',
     steps: [
-      { verb: '画给大家看', name: '声网互动白板', type: '共享画面 · Whiteboard', body: '画家使用画笔、颜色与橡皮作画，互动白板同步房间中的笔迹。画面有新变化时，浏览器提取画布快照，供 AI 观察。' },
+      { verb: '画给大家看', name: '共享画布', type: '画面同步 · Canvas', body: '画家使用画笔、颜色与橡皮在共享画布上作画，笔迹同步给房间里的其他人。画面有新变化时，浏览器保存画布快照，供 AI 观察。配置 Agora Interactive Whiteboard 后，房间也可以改用互动白板同步笔迹。' },
       { verb: '看图猜答案', name: 'AI 视觉语言模型', type: '图像理解 · VLM', body: '模型根据快照中的线条、形状和颜色，用中文给出猜测与视觉依据。模型知道完整的九个候选题目，但不知道玩家本轮选择了哪一个，也不会收到酒名或祝福。' },
       { verb: '同步猜题结果', name: '房间服务 × Agora RTM', type: '游戏状态 · Signaling', body: '服务端校验真人与 AI 的答案，结算得分并推进回合。RTM 通知伙伴刷新房间状态，房间轮询补充同步，让大家看到同一轮的结果。' },
     ],
@@ -29,7 +29,7 @@ const copy = {
     voice: 'When players join voice chat, Agora RTC shares their microphone audio with others in the room. The vision model reads the drawing, while RTC connects the players through voice. Your microphone only turns on when you choose to join voice chat.',
     flowTitle: 'From a first stroke to a correct guess.',
     steps: [
-      { verb: 'Share the sketch', name: 'Agora Interactive Whiteboard', type: 'Shared drawing · Whiteboard', body: 'The artist draws with pens, colors, and an eraser. The interactive whiteboard syncs strokes across the room. When the drawing changes, the browser captures a canvas snapshot for AI to inspect.' },
+      { verb: 'Share the sketch', name: 'Shared canvas', type: 'Synced drawing · Canvas', body: 'The artist draws with pens, colors, and an eraser on a shared canvas. Strokes sync to everyone in the room. When the drawing changes, the browser saves a snapshot for AI to inspect. With Agora Interactive Whiteboard credentials, the room can use the whiteboard instead.' },
       { verb: 'Guess from the image', name: 'AI Vision-Language Model', type: 'Image understanding · VLM', body: 'The model uses lines, shapes, and colors in the snapshot to return a Chinese guess and a short visual explanation. The model knows the full pool of nine topics, but not which one the artist selected. Drink names and wishes are never sent to the model.' },
       { verb: 'Share the result', name: 'Room Service × Agora RTM', type: 'Game state · Signaling', body: 'The server checks human and AI guesses, awards points, and advances rounds. RTM notifies other players to refresh room state, with polling providing additional updates so everyone follows the same round.' },
     ],
