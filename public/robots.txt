@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /room/
+Disallow: /api/
+Sitemap: https://agora-draw-guess.vercel.app/sitemap.xml

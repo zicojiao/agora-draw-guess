@@ -1,0 +1,9 @@
+.git-history
+.agora
+.wrangler
+.output
+node_modules
+.env*
+!.env.example
+qa-artifacts
+infrastructure

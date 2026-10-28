@@ -1,0 +1,26 @@
+{
+  "name": "你画AI猜 · 灵感碰杯",
+  "short_name": "你画AI猜",
+  "description": "朋友一起画，AI 一起猜，收获灵感祝福。",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#e0f2fe",
+  "theme_color": "#38bdf8",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    {
+      "src": "/favicon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "lang": "zh-CN"
+}

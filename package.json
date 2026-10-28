@@ -1,0 +1,55 @@
+{
+  "name": "agora-draw-guess",
+  "version": "0.1.0",
+  "description": "中文你画AI猜：与朋友和 AI 画友一起玩，画出灵感，收获祝福。",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "pnpm@11.6.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zicojiao/agora-draw-guess.git"
+  },
+  "homepage": "https://agora-draw-guess.vercel.app",
+  "bugs": {
+    "url": "https://github.com/zicojiao/agora-draw-guess/issues"
+  },
+  "scripts": {
+    "dev": "vite dev --port 3000",
+    "generate-routes": "tsr generate",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "node .output/server/index.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "@tanstack/react-router": "latest",
+    "@tanstack/react-start": "latest",
+    "agora-rtc-sdk-ng": "^4.24.8",
+    "agora-rtm": "^2.3.0",
+    "agora-token": "^2.0.5",
+    "netless-token": "1.0.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "regenerator-runtime": "0.14.1",
+    "sonner": "^2.0.8",
+    "white-web-sdk": "^2.16.58"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20260823.1",
+    "@tanstack/router-cli": "^1.132.0",
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vitejs/plugin-react": "^6.0.1",
+    "nitro": "latest",
+    "typescript": "^6.0.2",
+    "vite": "^8.0.0",
+    "vitest": "^4.0.18"
+  }
+}

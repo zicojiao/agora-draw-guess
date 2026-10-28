@@ -1,0 +1,198 @@
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { AiGuessQueue } from './ai-guess-queue'
+import { DrawingSync } from './drawing-sync'
+
+afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals() })
+const frame = { image: 'image', hasDrawing: true }
+
+describe('AI drawing queue', () => {
+  it('starts from a saved frame while newer strokes are still uploading', async () => {
+    vi.useFakeTimers()
+    let saveFirst!: (r: Response) => void
+    const upload = vi.fn().mockImplementationOnce(() => new Promise<Response>(r => { saveFirst = r }))
+      .mockImplementation(() => new Promise<Response>(() => {}))
+    vi.stubGlobal('fetch', upload)
+    const guess = vi.fn().mockResolvedValue(Response.json({ guess: { guess: '星星' } }))
+    const queue = new AiGuessQueue(guess, vi.fn(), vi.fn())
+    const sync = new DrawingSync('/drawing', () => 'seat', 'round', hasDrawing => queue.saved(hasDrawing), vi.fn(), vi.fn())
+    void sync.push(frame)
+    void sync.push({ ...frame, image: 'new strokes' })
+    saveFirst(Response.json({ ok: true }))
+    await vi.advanceTimersByTimeAsync(1)
+    expect(sync.busy).toBe(true)
+    expect(guess).toHaveBeenCalledOnce()
+    queue.dispose(); sync.dispose()
+  })
+
+  it('shows thinking immediately and keeps at most one request in flight', async () => {
+    vi.useFakeTimers()
+    let resolve!: (r: Response) => void
+    const request = vi.fn((_signal: AbortSignal) => new Promise<Response>(r => { resolve = r }))
+    const state = vi.fn()
+    const queue = new AiGuessQueue(request, state, vi.fn())
+    queue.saved(true)
+    await vi.advanceTimersByTimeAsync(1)
+    expect(state).toHaveBeenLastCalledWith('thinking', '')
+    queue.saved(true); queue.saved(true)
+    await vi.advanceTimersByTimeAsync(5000)
+    expect(request).toHaveBeenCalledOnce()
+    resolve(Response.json({ guess: {} }))
+    await vi.advanceTimersByTimeAsync(4000)
+    expect(request).toHaveBeenCalledTimes(2)
+    queue.dispose()
+  })
+
+  it('retries a temporary failure without another stroke, with a bounded retry count', async () => {
+    vi.useFakeTimers()
+    const request = vi.fn().mockResolvedValue(new Response('{}', { status: 503 }))
+    const state = vi.fn()
+    const queue = new AiGuessQueue(request, state, vi.fn())
+    queue.saved(true)
+    await vi.advanceTimersByTimeAsync(1)
+    expect(state.mock.calls.at(-1)?.[0]).toBe('retrying')
+    await vi.advanceTimersByTimeAsync(60000)
+    expect(request).toHaveBeenCalledTimes(3)
+    expect(state.mock.calls.at(-1)?.[0]).toBe('failed')
+    queue.dispose()
+  })
+
+  it('cancels an old round and ignores its late response', async () => {
+    vi.useFakeTimers()
+    let resolve!: (r: Response) => void
+    const request = vi.fn((_signal: AbortSignal) => new Promise<Response>(r => { resolve = r }))
+    const state = vi.fn(), updated = vi.fn()
+    const queue = new AiGuessQueue(request, state, updated)
+    queue.saved(true)
+    await vi.advanceTimersByTimeAsync(1)
+    queue.dispose(); state.mockClear()
+    resolve(Response.json({ guess: {} }))
+    await vi.advanceTimersByTimeAsync(5000)
+    expect(request.mock.calls[0][0].aborted).toBe(true)
+    expect(state).not.toHaveBeenCalled()
+    expect(updated).not.toHaveBeenCalled()
+  })
+
+  it('does not call vision for a blank board or repeat a completed frame', async () => {
+    vi.useFakeTimers()
+    const request = vi.fn().mockResolvedValue(Response.json({ guess: {} }))
+    const queue = new AiGuessQueue(request, vi.fn(), vi.fn())
+    queue.saved(false)
+    await vi.advanceTimersByTimeAsync(10000)
+    expect(request).not.toHaveBeenCalled()
+    queue.saved(true)
+    await vi.advanceTimersByTimeAsync(60000)
+    expect(request).toHaveBeenCalledOnce()
+    queue.dispose()
+  })
+  it('aborts a stalled request and moves to a visible retry state', async () => {
+    vi.useFakeTimers()
+    const request = vi.fn((signal: AbortSignal) => new Promise<Response>((_, reject) => {
+      signal.addEventListener('abort', () => reject(new DOMException('timeout', 'AbortError')))
+    }))
+    const state = vi.fn()
+    const queue = new AiGuessQueue(request, state, vi.fn())
+    queue.saved(true)
+    await vi.advanceTimersByTimeAsync(35001)
+    expect(request.mock.calls[0][0].aborted).toBe(true)
+    expect(state.mock.calls.at(-1)?.[0]).toBe('retrying')
+    queue.dispose()
+  })
+
+  it('allows an explicit retry after automatic retries are exhausted', async () => {
+    vi.useFakeTimers()
+    const request = vi.fn().mockResolvedValue(new Response('{}', { status: 503 }))
+    const queue = new AiGuessQueue(request, vi.fn(), vi.fn())
+    queue.saved(true)
+    await vi.advanceTimersByTimeAsync(60000)
+    request.mockResolvedValue(Response.json({ guess: {} }))
+    queue.retry()
+    await vi.advanceTimersByTimeAsync(1)
+    expect(request).toHaveBeenCalledTimes(4)
+    queue.dispose()
+  })
+
+  it('does not retry a failed request after the artist clears the board', async () => {
+    vi.useFakeTimers()
+    let reject!: (e: Error) => void
+    const request = vi.fn(() => new Promise<Response>((_, r) => { reject = r }))
+    const state = vi.fn()
+    const queue = new AiGuessQueue(request, state, vi.fn())
+    queue.saved(true)
+    await vi.advanceTimersByTimeAsync(1)
+    queue.saved(false)
+    reject(new Error('offline'))
+    await vi.advanceTimersByTimeAsync(60000)
+    queue.retry()
+    await vi.advanceTimersByTimeAsync(1)
+    expect(request).toHaveBeenCalledOnce()
+    expect(state).toHaveBeenLastCalledWith('idle', '')
+    queue.dispose()
+  })
+
+  it.each([{ won: true }, { stale: true }, { code: 'ROUND_CLOSED' }])('stops queued work after a terminal reply: %j', async (body) => {
+    vi.useFakeTimers()
+    let resolve!: (r: Response) => void
+    const request = vi.fn(() => new Promise<Response>(r => { resolve = r }))
+    const state = vi.fn(), updated = vi.fn()
+    const queue = new AiGuessQueue(request, state, updated)
+    queue.saved(true)
+    await vi.advanceTimersByTimeAsync(1)
+    queue.saved(true)
+    resolve(Response.json(body, { status: 'code' in body ? 409 : 200 }))
+    await vi.advanceTimersByTimeAsync(60000)
+    queue.saved(true); queue.retry()
+    await vi.advanceTimersByTimeAsync(60000)
+    expect(request).toHaveBeenCalledOnce()
+    expect(updated).toHaveBeenCalledOnce()
+    expect(state.mock.calls.some(([value]) => value === 'retrying' || value === 'failed')).toBe(false)
+    queue.dispose()
+  })
+
+  it('returns to idle when an in-flight success arrives after clearing', async () => {
+    vi.useFakeTimers()
+    let resolve!: (r: Response) => void
+    const state = vi.fn()
+    const queue = new AiGuessQueue(() => new Promise<Response>(r => { resolve = r }), state, vi.fn())
+    queue.saved(true)
+    await vi.advanceTimersByTimeAsync(1)
+    queue.saved(false)
+    resolve(Response.json({ guess: {} }))
+    await vi.advanceTimersByTimeAsync(1)
+    expect(state).toHaveBeenLastCalledWith('idle', '')
+    queue.dispose()
+  })
+
+})
+
+it('checks newer strokes immediately after a slow response, without another four-second delay', async () => {
+  vi.useFakeTimers()
+  let resolve!: (r: Response) => void
+  const request = vi.fn().mockImplementationOnce(() => new Promise<Response>(r => { resolve = r })).mockResolvedValue(Response.json({ guess: {} }))
+  const queue = new AiGuessQueue(request, vi.fn(), vi.fn())
+  queue.saved(true)
+  await vi.advanceTimersByTimeAsync(1)
+  queue.saved(true)
+  await vi.advanceTimersByTimeAsync(3000)
+  resolve(Response.json({ guess: {} }))
+  await vi.advanceTimersByTimeAsync(5)
+  expect(request).toHaveBeenCalledTimes(2)
+  queue.dispose()
+})
+
+it('rate-limits fast responses and resumes queued work after reconnect', async () => {
+  vi.useFakeTimers()
+  const request = vi.fn().mockImplementation(() => Promise.resolve(Response.json({ guess: {} })))
+  const queue = new AiGuessQueue(request, vi.fn(), vi.fn())
+  queue.saved(true)
+  await vi.advanceTimersByTimeAsync(1)
+  queue.saved(true)
+  await vi.advanceTimersByTimeAsync(1000)
+  expect(request).toHaveBeenCalledOnce()
+  queue.setOnline(false)
+  await vi.advanceTimersByTimeAsync(10000)
+  expect(request).toHaveBeenCalledOnce()
+  queue.setOnline(true)
+  await vi.advanceTimersByTimeAsync(1)
+  expect(request).toHaveBeenCalledTimes(2)
+  queue.dispose()
+})

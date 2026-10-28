@@ -1,0 +1,3 @@
+import { createFileRoute } from '@tanstack/react-router'
+import { LegalPage } from '#/components/legal-page'
+export const Route=createFileRoute('/privacy')({component:()=> <LegalPage eyebrow="隐私说明" title="安心画，开心猜。" updated="2026 年 10 月 19 日"><h2>房间与画面</h2><p>我们保存昵称、临时房间席位、游戏积分、猜题记录和共享画面，用于同步本场游戏。房间有效期为四小时，到期后无法访问；过期房间会在新房间创建时清理。</p><h2>AI 识图</h2><p>开启 AI 画友后，共享画面和先前的 AI 猜测会发送给视觉模型。模型会看到完整的九个候选题目，但不知道玩家本轮选择了哪一个；对应酒名和祝福不会发送给模型。请不要在画板中写入私人信息。</p><h2>实时服务</h2><p>Vercel 提供网站和服务端运行，Cloudflare D1 保存游戏记录，Agora 提供可选的实时语音和房间信令。麦克风仅在你点击加入语音并允许后开启。</p><h2>本机存储</h2><p>浏览器会保存你的昵称、音效偏好和房间席位。清理本站浏览器数据可移除这些信息，也会失去原有席位。</p></LegalPage>})
